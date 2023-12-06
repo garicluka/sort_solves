@@ -1,0 +1,18 @@
+[package]
+name = "sort_solves"
+version = "0.1.0"
+authors = ["Luka Garic <garicluka03@gmail.com"]
+edition = "2021"
+description = "binary for sorting rubik's cube solves"
+license = "MIT"
+keywords = ["rubiks", "cli", "binary"]
+categories = ["command-line-utilities"]
+repository = "https://github.com/garicluka/sort_solves/"
+
+[dependencies]
+chrono = { version = "0.4.31", features = ["serde"] }
+clap = { version = "4.4.10", features = ["derive"] }
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+rand = "0.8.5"
+uuid = { version = "1.6.1", features = ["v4"] }
