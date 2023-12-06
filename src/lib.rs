@@ -66,24 +66,37 @@ pub fn create_best_single_solves(solves: &mut Vec<Ao5Solve>) {
     });
 }
 
-pub fn transform_solves(old_solves: &Vec<Solve>) -> Vec<Ao5Solve> {
-    let mut new_solves = Vec::new();
+pub fn transform_and_sort_by_latest(old_solves: &Vec<Solve>) -> Vec<Ao5Solve> {
+    let mut new_solves: Vec<Ao5Solve> = old_solves
+        .iter()
+        .map(|solve| {
+            return Ao5Solve {
+                time: f64::NAN,
+                dnf: false,
+                none: false,
+                last_solve: solve.clone(),
+            };
+        })
+        .collect();
 
-    for i in 0..old_solves.len() {
+    new_solves.sort_by(|a, b| {
+        if a.last_solve.created_at > b.last_solve.created_at {
+            return Ordering::Less;
+        } else {
+            return Ordering::Greater;
+        }
+    });
+
+    for i in 0..new_solves.len() {
         if i > old_solves.len() - 5 {
-            let mut time = old_solves[i].time;
-            if old_solves[i].plus_two {
+            let mut time = new_solves[i].last_solve.time;
+            if new_solves[i].last_solve.plus_two {
                 time += 2.0;
             }
-            new_solves.push(Ao5Solve {
-                time: f64::NAN,
-                none: true,
-                dnf: false,
-                last_solve: Solve {
-                    time,
-                    ..old_solves[i].clone()
-                },
-            });
+            new_solves[i].time = f64::NAN;
+            new_solves[i].none = true;
+            new_solves[i].dnf = false;
+            new_solves[i].last_solve.time = time;
             continue;
         }
 
@@ -92,17 +105,17 @@ pub fn transform_solves(old_solves: &Vec<Solve>) -> Vec<Ao5Solve> {
         let mut worst_time = f64::NEG_INFINITY;
         let mut time_sum = 0.0;
         let mut times = [
-            old_solves[i].time,
-            old_solves[i + 1].time,
-            old_solves[i + 2].time,
-            old_solves[i + 3].time,
-            old_solves[i + 4].time,
+            new_solves[i].last_solve.time,
+            new_solves[i + 1].last_solve.time,
+            new_solves[i + 2].last_solve.time,
+            new_solves[i + 3].last_solve.time,
+            new_solves[i + 4].last_solve.time,
         ];
         for j in i..(i + 5) {
-            if old_solves[j].plus_two {
+            if new_solves[j].last_solve.plus_two {
                 times[j - i] += 2.0;
             }
-            if !old_solves[j].dnf {
+            if !new_solves[j].last_solve.dnf {
                 valid_times += 1;
                 if times[j - i] < best_time {
                     best_time = times[j - i];
@@ -124,28 +137,13 @@ pub fn transform_solves(old_solves: &Vec<Solve>) -> Vec<Ao5Solve> {
         } else {
             time = (time_sum - best_time - worst_time) / 3.0;
         }
-
-        new_solves.push(Ao5Solve {
-            time,
-            dnf,
-            none: false,
-            last_solve: Solve {
-                ..old_solves[i].clone()
-            },
-        })
+        new_solves[i].time = time;
+        new_solves[i].none = false;
+        new_solves[i].dnf = dnf;
+        new_solves[i].last_solve.time = times[0];
     }
 
     new_solves
-}
-
-pub fn create_latest_solves(old_solves: &mut Vec<Ao5Solve>) {
-    old_solves.sort_by(|a, b| {
-        if a.last_solve.created_at > b.last_solve.created_at {
-            return Ordering::Less;
-        } else {
-            return Ordering::Greater;
-        }
-    });
 }
 
 pub fn sort_solves(
@@ -153,14 +151,13 @@ pub fn sort_solves(
     sort_order: SortOrder,
     sort_by: SortBy,
 ) -> Vec<Ao5Solve> {
-    let mut new_solves = transform_solves(old_solves);
+    let mut new_solves = transform_and_sort_by_latest(old_solves);
 
     match sort_order {
         SortOrder::Latest => {
-            create_latest_solves(&mut new_solves);
+            // already sorted by latest
         }
         SortOrder::Oldest => {
-            create_latest_solves(&mut new_solves);
             new_solves.reverse();
         }
         SortOrder::Best => match sort_by {

@@ -3,7 +3,7 @@ sort_solves
 
 sort_solves is binary that takes json file with rubik's cube solves and makes new json file with sorted solves.
 
-[![thing](https://img.shields.io/badge/v0.1.0%20-%20sort_solves%2Fimg1?label=crates.io)](https://www.crates.io/crates/sort_solves)
+[![thing](https://img.shields.io/badge/v0.2.0%20-%20sort_solves?label=crates.io)](https://www.crates.io/crates/sort_solves)
 
 
 

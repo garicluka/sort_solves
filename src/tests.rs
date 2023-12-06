@@ -27,7 +27,7 @@ fn create_test_data(number_of_solves: usize) -> Vec<Solve> {
 #[test]
 fn transforms_solves_correctly() {
     let old_solves = create_test_data(100);
-    let new_solves = transform_solves(&old_solves);
+    let new_solves = transform_and_sort_by_latest(&old_solves);
 
     let mut ao5_dnf_count = 0;
     let mut ao5_none_count = 0;
@@ -46,21 +46,8 @@ fn transforms_solves_correctly() {
 }
 
 #[test]
-fn sort_solves_by_latest() {
-    let mut solves = transform_solves(&create_test_data(100));
-    create_latest_solves(&mut solves);
-    let mut prev = &solves[0];
-    for i in solves.iter() {
-        if prev.last_solve.created_at < i.last_solve.created_at {
-            panic!("create_latest does not sort properly!");
-        }
-        prev = i;
-    }
-}
-
-#[test]
 fn sort_solves_by_best_ao5() {
-    let mut solves = transform_solves(&create_test_data(100));
+    let mut solves = transform_and_sort_by_latest(&create_test_data(100));
     create_best_ao5_solves(&mut solves);
     let mut prev = &solves[0];
     for i in solves.iter() {
@@ -76,7 +63,7 @@ fn sort_solves_by_best_ao5() {
 
 #[test]
 fn sort_solves_by_best_single() {
-    let mut solves = transform_solves(&create_test_data(100));
+    let mut solves = transform_and_sort_by_latest(&create_test_data(100));
     create_best_single_solves(&mut solves);
     let mut prev = &solves[0];
     for i in solves.iter() {

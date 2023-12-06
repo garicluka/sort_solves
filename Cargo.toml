@@ -1,6 +1,6 @@
 [package]
 name = "sort_solves"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Luka Garic <garicluka03@gmail.com"]
 edition = "2021"
 description = "binary for sorting rubik's cube solves"
